@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Heart Rate Monitor</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f0f0f0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .reading {
+            margin: 10px 0;
+            padding: 15px;
+            border-radius: 5px;
+            background-color: #f8f9fa;
+        }
+        .emotion {
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+        .averages {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #e9ecef;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Heart Rate Monitor</h1>
+        <div class="reading">
+            <h2>Current Readings</h2>
+            <h3>Heart Rate: <span id="heartRate">--</span> BPM</h3>
+            <h3>SpO2: <span id="spo2">--</span>%</h3>
+            <h3>Emotion: <span id="emotion" class="emotion">--</span></h3>
+        </div>
+        <div class="averages">
+            <h2>Hourly Averages</h2>
+            <h3>Average Heart Rate: <span id="avgHeartRate">--</span> BPM</h3>
+            <h3>Average SpO2: <span id="avgSpo2">--</span>%</h3>
+        </div>
+        <p>Last updated: <span id="timestamp">--</span></p>
+    </div>
+
+    <script>
+        function updateReadings() {
+            fetch('/get_data')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('heartRate').textContent = data.heartRate.toFixed(1);
+                    document.getElementById('spo2').textContent = data.spo2;
+                    document.getElementById('emotion').textContent = data.emotion;
+                    document.getElementById('avgHeartRate').textContent = data.avgHeartRate.toFixed(1);
+                    document.getElementById('avgSpo2').textContent = data.avgSpo2.toFixed(1);
+                    document.getElementById('timestamp').textContent = data.timestamp;
+                });
+        }
+
+        // Update readings every second
+        setInterval(updateReadings, 1000);
+    </script>
+</body>
+</html>

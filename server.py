@@ -1,42 +1,38 @@
 from flask import Flask, request, render_template, jsonify
-from flask_cors import CORS
-from datetime import datetime
+import json
 
 app = Flask(__name__)
-CORS(app)
 
+# Store the latest data received from ESP8266
 latest_data = {
-    "heartRate": 0,
-    "spo2": 0,
-    "emotion": "No data",
-    "avgHeartRate": 0,
-    "avgSpo2": 0,
-    "timestamp": "No data"
+    'heartRate': 0,
+    'spo2': 0,
+    'emotion': 'UNKNOWN',
+    'avgHeartRate1Hr': 0
 }
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    # Render the main page and pass the latest data to the template
+    return render_template('index.html', data=latest_data)
 
 @app.route('/update', methods=['POST'])
-def update_data():
-    global latest_data
-    data = request.json
-    
-    latest_data = {
-        "heartRate": data.get('heartRate', 0),
-        "spo2": data.get('spo2', 0),
-        "emotion": data.get('emotion', 'Unknown'),
-        "avgHeartRate": data.get('avgHeartRate', 0),
-        "avgSpo2": data.get('avgSpo2', 0),
-        "timestamp": datetime.now().strftime("%H:%M:%S")
-    }
-    
-    return jsonify({"status": "success"})
+def update():
+    # Receive data from ESP8266
+    if request.is_json:
+        data = request.get_json()
+        latest_data['heartRate'] = data.get('heartRate', 0)
+        latest_data['spo2'] = data.get('spo2', 0)
+        latest_data['emotion'] = data.get('emotion', 'UNKNOWN')
+        latest_data['avgHeartRate1Hr'] = data.get('avg1hr', 0)
+        return 'Data received successfully!', 200
+    else:
+        return 'Invalid data format', 400
 
-@app.route('/get_data')
-def get_data():
+@app.route('/live_data', methods=['GET'])
+def live_data():
+    # Return the latest data as JSON
     return jsonify(latest_data)
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', debug=True)
+    app.run(host='0.0.0.0', port=5000)

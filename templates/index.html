@@ -1,72 +1,75 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Heart Rate Monitor</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            margin: 20px;
-            background-color: #f0f0f0;
-        }
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            background-color: white;
+            background-color: #f5f5f5;
+            margin: 0;
             padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
-        .reading {
-            margin: 10px 0;
-            padding: 15px;
-            border-radius: 5px;
-            background-color: #f8f9fa;
+        h1 {
+            color: #333;
         }
-        .emotion {
+        .data-container {
+            background-color: #fff;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        .data-container p {
+            font-size: 18px;
+            color: #333;
+        }
+        .data-container .emotion {
             font-weight: bold;
-            font-size: 1.2em;
+            font-size: 20px;
         }
-        .averages {
-            margin-top: 20px;
-            padding: 15px;
-            background-color: #e9ecef;
-            border-radius: 5px;
+        .data-container .avg-hr {
+            font-size: 20px;
+            color: #007bff;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Heart Rate Monitor</h1>
-        <div class="reading">
-            <h2>Current Readings</h2>
-            <h3>Heart Rate: <span id="heartRate">--</span> BPM</h3>
-            <h3>SpO2: <span id="spo2">--</span>%</h3>
-            <h3>Emotion: <span id="emotion" class="emotion">--</span></h3>
-        </div>
-        <div class="averages">
-            <h2>Hourly Averages</h2>
-            <h3>Average Heart Rate: <span id="avgHeartRate">--</span> BPM</h3>
-            <h3>Average SpO2: <span id="avgSpo2">--</span>%</h3>
-        </div>
-        <p>Last updated: <span id="timestamp">--</span></p>
+
+    <h1>Heart Rate Monitor</h1>
+
+    <div class="data-container">
+        <p><strong>Heart Rate:</strong> <span id="heartRate">0</span> bpm</p>
+        <p><strong>SpO2:</strong> <span id="spo2">0</span>%</p>
+        <p><strong>Emotion:</strong> <span id="emotion">UNKNOWN</span></p>
+    </div>
+
+    <div class="data-container">
+        <p class="avg-hr"><strong>1-Hour Avg Heart Rate:</strong> <span id="avgHeartRate1Hr">0</span> bpm</p>
     </div>
 
     <script>
-        function updateReadings() {
-            fetch('/get_data')
+        // Function to fetch the live data from the server every 1 second
+        function fetchLiveData() {
+            fetch('/live_data')
                 .then(response => response.json())
                 .then(data => {
-                    document.getElementById('heartRate').textContent = data.heartRate.toFixed(1);
+                    // Update the page with the new data
+                    document.getElementById('heartRate').textContent = data.heartRate;
                     document.getElementById('spo2').textContent = data.spo2;
                     document.getElementById('emotion').textContent = data.emotion;
-                    document.getElementById('avgHeartRate').textContent = data.avgHeartRate.toFixed(1);
-                    document.getElementById('avgSpo2').textContent = data.avgSpo2.toFixed(1);
-                    document.getElementById('timestamp').textContent = data.timestamp;
-                });
+                    document.getElementById('avgHeartRate1Hr').textContent = data.avgHeartRate1Hr;
+                })
+                .catch(error => console.error('Error fetching live data:', error));
         }
 
-        // Update readings every second
-        setInterval(updateReadings, 1000);
+        // Set the function to be called every second (1000 ms)
+        setInterval(fetchLiveData, 1000); // Update every 1 second
+
+        // Fetch data immediately when the page loads
+        fetchLiveData();
     </script>
+
 </body>
 </html>

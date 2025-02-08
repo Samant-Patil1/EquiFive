@@ -119,7 +119,6 @@ kaggle==1.6.17
 keras==3.7.0
 Kivy==2.3.1
 Kivy-Garden==0.1.5
-kivy_deps.glew==0.3.1
 kivy_deps.sdl2==0.8.0
 kiwisolver==1.4.8
 llama_models==0.0.63
